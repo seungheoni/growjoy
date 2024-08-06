@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: growjoy
+
+file:
+  upload-dir: /Users/seungheon/IdeaProjects/growjoy/image
+
+openai:
+  api-key: open-api-key
