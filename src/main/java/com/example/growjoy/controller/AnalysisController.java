@@ -92,6 +92,7 @@ public class AnalysisController {
     }
 
 
+
     public String analyzeImage(File imageFile) {
         try {
             String base64Image = encodeImage(imageFile);
@@ -104,7 +105,7 @@ public class AnalysisController {
 
             Map<String, String> textContent = new HashMap<>();
             textContent.put("type", "text");
-            textContent.put("text", "What’s in this image?");
+            textContent.put("text", "한국말로 하고 식물학자처럼 대답해주세요. 문단은 식물 상태, 의견으로 2가지 문단으로 얘기해주시면 됩니다.");
 
             Map<String, Object> imageUrl = new HashMap<>();
             imageUrl.put("url", "data:image/jpeg;base64," + base64Image);
