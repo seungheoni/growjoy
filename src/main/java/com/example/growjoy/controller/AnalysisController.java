@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -22,8 +24,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-
-@RestController
+@Controller
 @RequestMapping("/analysis")
 public class AnalysisController {
     @Value("${file.upload-dir}")
@@ -32,8 +33,13 @@ public class AnalysisController {
     @Value("${openai.api-key}")
     private String apiKey;
 
+    @GetMapping
+    public String index() {
+        return "index";
+    }
+
     @PostMapping("/image")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+    public String uploadImage(@RequestParam("file") MultipartFile file, Model model) {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
         try {
@@ -48,16 +54,14 @@ public class AnalysisController {
             // 변환된 파일을 OpenAI API로 보내는 코드 호출
             String analysisResponse = analyzeImage(convertedFile);
 
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/analysis/image/")
-                    .path(fileName)
-                    .toUriString();
+            model.addAttribute("analysisResponse", analysisResponse);
+            model.addAttribute("fileName", fileName);
 
-            return ResponseEntity.ok(analysisResponse);
+            return "result";
         } catch (IOException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 실패");
+            model.addAttribute("message", "파일 업로드 실패");
+            return "error";
         }
-
     }
 
     @GetMapping("/image/{fileName:.+}")
@@ -91,8 +95,6 @@ public class AnalysisController {
         return convFile;
     }
 
-
-
     public String analyzeImage(File imageFile) {
         try {
             String base64Image = encodeImage(imageFile);
@@ -105,7 +107,7 @@ public class AnalysisController {
 
             Map<String, String> textContent = new HashMap<>();
             textContent.put("type", "text");
-            textContent.put("text", "한국말로 하고 식물학자처럼 대답해주세요. 문단은 식물 상태, 의견으로 2가지 문단으로 얘기해주시면 됩니다.");
+            textContent.put("text", "식물학자처럼 대답해주세요. 이 식물의 상태가 어떤가요?");
 
             Map<String, Object> imageUrl = new HashMap<>();
             imageUrl.put("url", "data:image/jpeg;base64," + base64Image);
@@ -125,6 +127,7 @@ public class AnalysisController {
             return null;
         }
     }
+
     private String encodeImage(File file) throws IOException {
         FileInputStream imageInFile = new FileInputStream(file);
         byte[] imageData = new byte[(int) file.length()];

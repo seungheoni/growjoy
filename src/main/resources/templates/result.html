@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>분석 결과</title>
+</head>
+<body>
+<h1>분석 결과</h1>
+<p th:text="${analysisResponse}"></p>
+<img th:src="@{/analysis/image/{fileName}(fileName=${fileName})}" alt="Uploaded Image"/>
+<a href="/">다시 업로드</a>
+</body>
+</html>
