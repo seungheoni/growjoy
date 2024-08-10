@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  grow-joy-agent:
+    image: lsh.side/grow-joy-agent:latest
+    container_name: grow-joy-agent
+    ports:
+      - '8080:8080'
